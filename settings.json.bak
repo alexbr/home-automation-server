@@ -1,0 +1,12 @@
+{
+   "port": 5004,
+   "securePort": 5005,
+   "auth": {
+      "username": "username",
+      "pass": "password"
+   },
+   "https": {
+      "key": "server.key",
+      "cert": "server.crt"
+   }
+}
