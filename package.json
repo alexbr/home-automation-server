@@ -19,7 +19,7 @@
     "jade": "~1.11.0",
     "lodash": "*",
     "morgan": "~1.7.0",
-    "serve-favicon": "~2.3.0",
-    "sonos-http-api": "*"
+    "sonos-http-api": "jishi/node-sonos-http-api",
+    "serve-favicon": "~2.3.0"
   }
 }
