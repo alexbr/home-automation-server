@@ -20,6 +20,6 @@
     "lodash": "*",
     "morgan": "~1.7.0",
     "serve-favicon": "~2.3.0",
-    "sonos-http-api": "git+https://github.com/alexbr/node-sonos-http-api"
+    "sonos-http-api": "*"
   }
 }
