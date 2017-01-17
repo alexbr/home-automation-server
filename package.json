@@ -11,6 +11,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "basic-auth": "*",
     "body-parser": "~1.15.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.2.0",
@@ -19,6 +20,7 @@
     "jade": "~1.11.0",
     "lodash": "*",
     "morgan": "~1.7.0",
+    "sonos-discovery": "jishi/node-sonos-discovery",
     "sonos-http-api": "jishi/node-sonos-http-api",
     "serve-favicon": "~2.3.0"
   }
