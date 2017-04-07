@@ -59,27 +59,29 @@ app.all('*', (req, res, next) => {
 app.use('/', index);
 
 // Serve up static files from the webroot
-var sonosStatic = express.static(settings.webroot);
+var sonosStatic = express.static(settings.webroot + '/sonos');
 
 app.use('/sonos', sonosStatic, sonos);
 app.use('/hs100', hs100);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+app.use((req, res, next) => {
+   var err = new Error('Not Found');
+   err.status = 404;
+   next(err);
 });
 
 // error handler
-app.use(function(err, req, res) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.use((err, req, res, next) => {
+   void(next);
+   console.warn('rendering error');
+   // set locals, only providing error in development
+   res.locals.message = err.message;
+   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+   // render the error page
+   res.status(err.status || 500);
+   res.render('error');
 });
 
 module.exports = app;

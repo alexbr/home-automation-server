@@ -1,0 +1,20 @@
+extends ../layout
+
+block content
+   a(href='/') Back
+
+   h1= title
+   div(class='docs')
+      h2= 'Info'
+      p
+         span(class='method') GET
+         a(href='info') /info
+      p
+         span(class='method') GET
+         /{plugname} (get plug data)
+      p
+         span(class='method') GET
+         /{plugname}/state (get current state)
+      p
+         span(class='method') GET
+         /{plugname}/state/{state=on|true|off|false}

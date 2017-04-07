@@ -22,6 +22,7 @@
     "morgan": "~1.7.0",
     "sonos-discovery": "jishi/node-sonos-discovery",
     "sonos-http-api": "jishi/node-sonos-http-api",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "winston": "*"
   }
 }

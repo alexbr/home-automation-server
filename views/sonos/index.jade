@@ -1,0 +1,110 @@
+extends ../layout
+
+block content
+   a(href='/') Back
+   img(class='logo' src='sonos-icon.png' alt='Sonos' width='256px')
+
+   div(class='content')
+      h1= title
+
+      div(class='docs')
+         h2 Info
+         p
+            span(class='method') GET
+            a(href='sonos') /zones
+         p
+            span(class='method') GET
+            a(href='favorites') /favorites
+         p
+            span(class='method') GET
+            a(href='playlists') /playlists
+
+      div(class='docs')
+         h2 Global Control
+         p
+            span(class='method') GET
+            a(href='lockvolumes') /lockvolumes
+         p
+            span(class='method') GET
+            a(href='unlockvolumes') /unlockvolumes
+         p
+            span(class='method') GET
+            a(href='pauseall') /pauseall
+         p
+            span(class='method') GET
+            a(href='resumeall') /resumeall
+         p
+            span(class='method') GET
+            a(href='reindex') /reindex
+         p
+            span(class='method') GET
+            /sleep/{timeout in seconds or timestamp HH:MM:SS or off}
+         p
+            span(class='method') GET
+            /preset/{JSON preset}
+         p
+            span(class='method') GET
+            /preset/{predefined preset name}
+
+      div(class='docs')
+         h2 Zone Control
+         p
+            span(class='method') GET
+            /{zone name}/{action}[/{parameter}]
+
+         h3 Actions
+         ul
+            li
+               strong play
+            li
+               strong pause
+            li
+               strong playpause (toggles playing state)
+            li
+               strong volume (parameter is absolute or relative volume. Prefix +/- indicates relative volume)
+            li
+               strong groupVolume (parameter is absolute or relative volume. Prefix +/- indicates relative volume)
+            li
+               strong mute / unmute
+            li
+               strong groupMute / groupUnmute
+            li
+               strong togglemute (toggles mute state)
+            li
+               strong seek (parameter is queue index)
+            li
+               strong trackseek (parameter is in seconds, 60 for 1:00, 120 for 2:00 etc)
+            li
+               strong next
+            li
+               strong previous
+            li
+               strong state (will return a json-representation of the current state of player)
+            li
+               strong favorite
+            li
+               strong playlist
+            li
+               strong lockvolumes / unlockvolumes (experimental, will enforce the volume that was selected when locking!)
+            li
+               strong repeat (on/off)
+            li
+               strong shuffle (on/off)
+            li
+               strong crossfade (on/off)
+            li
+               strong pauseall (with optional timeout in minutes)
+            li
+               strong resumeall (will resume the ones that was pause on the pauseall call. Useful for doorbell, phone calls, etc. Optional timeout)
+            li
+               strong say
+            li
+               strong queue
+            li
+               strong clearqueue
+
+      div(class='footer')
+         p
+            a(href='/docs') Full documentation
+         p Learn more at
+            a(href='https://github.com/jishi/node-sonos-http-api') https://github.com/jishi/node-sonos-http-api

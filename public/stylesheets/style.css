@@ -1,8 +1,52 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+   padding: 25px;
+   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
-
 a {
-  color: #00B7FF;
+   color: #333333;
+   color: #00B7FF;
+   text-decoration: none;
+}
+a:hover {
+   text-decoration: underline;
+}
+h1 {
+   text-align: center;
+}
+.logo {
+   display: block;
+   margin: auto;
+}
+.content {
+   margin: 20px 25%;
+}
+.docs {
+   background-color: #f4f4f4;
+   border-radius: 4px;
+   padding: 10px;
+   margin-bottom: 20px;
+}
+.docs p {
+   padding: 0;
+   margin: 0;
+   line-height: 28px;
+   font-size: 14px;
+   font-family: Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+}
+.docs .method {
+   background-color: #dbdbdb;
+   padding: 4px;
+   border-radius: 2px;
+   margin-right: 4px;
+}
+.docs h2 {
+   margin-bottom: 8px;
+}
+.docs h2:first-child {
+   margin-top: 0;
+}
+.footer {
+   text-align: center;
+   font-size: 12px;
+   margin: 10px 0 50px 0;
 }
