@@ -5,7 +5,18 @@ block content
 
    h1= title
    div(class='docs')
-      h2= 'Info'
+      h2= 'Plug Control'
+      each plug, plugName in plugsData
+         p= plugName + ' is ' + (plug.state ? 'on' : 'off')
+            | 
+            a(href=plugName + '/on') Turn on
+            | 
+            a(href=plugName + '/off') Turn off
+            | 
+            a(href=plugName) Get info
+
+   div(class='docs')
+      h2= 'API Info'
       p
          span(class='method') GET
          a(href='info') /info
@@ -17,4 +28,4 @@ block content
          /{plugname}/state (get current state)
       p
          span(class='method') GET
-         /{plugname}/state/{state=on|true|off|false}
+         /{plugname}/{state=on|true|off|false}

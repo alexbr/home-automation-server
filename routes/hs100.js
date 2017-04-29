@@ -6,7 +6,7 @@ const client = new hs100.Client({ debug: true });
 const logger = require('winston');
 
 // Find plugs
-var plugs = {};
+const plugs = {};
 client.startDiscovery().on('plug-new', plug => {
    plugs[plug.name] = plug;
 }).on('plug-offline', plug => {
@@ -15,20 +15,16 @@ client.startDiscovery().on('plug-new', plug => {
 });
 
 router.get('/', (req, res) => {
-   res.render('hs100/index', {
-      title: 'HS100 API',
+   getAllPlugsData().then(plugsData => {
+      res.render('hs100/index', {
+         title: 'HS100',
+         plugsData: plugsData,
+      });
    });
 });
 
 router.get('/info', (req, res) => {
-   var plugsData = {};
-   var promises = _.map(plugs, plug => {
-      return getPlugData(plug).then(plugData => {
-         plugsData[plugData.name] = plugData;
-      });
-   });
-
-   Promise.all(promises).then(() => sendSuccess(res, plugsData));
+   getAllPlugsData().then(plugsData => sendSuccess(res, plugsData));
 });
 
 router.get('/:plugname/state', (req, res) => {
@@ -47,7 +43,7 @@ router.get('/:plugname/state', (req, res) => {
    });
 });
 
-router.get('/:plugname/state/:state', (req, res) => {
+router.get('/:plugname/:state', (req, res) => {
    var plugname = req.params.plugname;
    var state = req.params.state;
 
@@ -79,6 +75,17 @@ router.get('/:plugname', (req, res) => {
 
    return getPlugData(plug).then(plugData => sendSuccess(res, plugData));
 });
+
+function getAllPlugsData() {
+   const plugsData = {};
+   const promises = _.map(plugs, plug => {
+      return getPlugData(plug).then(plugData => {
+         plugsData[plugData.name] = plugData;
+      });
+   });
+
+   return Promise.all(promises).then(() => plugsData);
+}
 
 function getPlugData(plug) {
    var promises = [];
