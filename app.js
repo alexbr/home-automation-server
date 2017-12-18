@@ -8,9 +8,13 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
 const index = require('./routes/index');
-const sonos = require('./routes/sonos');
+const Sonos = require('./routes/sonos');
 const hs100 = require('./routes/hs100');
+const SonosGoogle = require('./routes/sonos-google');
 const settings = require('./settings');
+const SonosSystem = require('sonos-discovery');
+
+const discovery = new SonosSystem(settings);
 
 var app = express();
 
@@ -58,10 +62,17 @@ app.all('*', (req, res, next) => {
 
 app.use('/', index);
 
+// Sonos via Echo
 // Serve up static files from the webroot
 var sonosStatic = express.static(settings.webroot + '/sonos');
+var sonos = new Sonos(discovery);
+app.use('/sonos', sonosStatic, sonos.getRouter());
 
-app.use('/sonos', sonosStatic, sonos);
+// Sonos via Google
+var sonosGoogle = new SonosGoogle(discovery);
+app.use('/sonos-google', sonosGoogle.getRouter());
+
+// TP-Link HS-100
 app.use('/hs100', hs100);
 
 // catch 404 and forward to error handler
