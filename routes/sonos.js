@@ -3,10 +3,13 @@ const SonosSystem = require('sonos-discovery');
 const settings = require('../settings');
 const logger = require('../lib/logger');
 const SonosAPI = require('../lib/sonos-api');
+const basicAuth = require('../lib/basic-auth');
 
 function Sonos(discovery) {
    const api = new SonosAPI(settings);
    const router = express.Router();
+
+   router.all('*', basicAuth.checkAuth(settings));
 
    router.get('/', (req, res) => {
       res.render('sonos/index', {

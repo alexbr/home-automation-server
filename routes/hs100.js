@@ -1,18 +1,25 @@
+'use strict';
+
 const _ = require('lodash');
 const express = require('express');
 const router = express.Router();
-const hs100 = require('hs100-api');
+const hs100 = require('tplink-smarthome-api');
 const client = new hs100.Client({ debug: true });
-const logger = require('winston');
+const logger = require('../lib/logger');
+const settings = require('../settings');
+const basicAuth = require('../lib/basic-auth');
 
 // Find plugs
 const plugs = {};
 client.startDiscovery().on('plug-new', plug => {
+   logger.info(`found plug ${plug.name} at ${plug.host}`);
    plugs[plug.name] = plug;
 }).on('plug-offline', plug => {
    logger.warn('plug offline', plug);
    delete plugs[plug.name];
 });
+
+router.all('*', basicAuth.checkAuth(settings));
 
 router.get('/', (req, res) => {
    getAllPlugsData().then(plugsData => {
@@ -67,8 +74,8 @@ router.get('/:plugname/:state', (req, res) => {
 });
 
 router.get('/:plugname', (req, res) => {
-   var plugname = req.params.plugname;
-   var plug = plugs[plugname];
+   const plugname = req.params.plugname;
+   const plug = plugs[plugname];
    if (!plug) {
       return sendError(res, `Plug ${plugname} not found.`);
    }
@@ -88,17 +95,21 @@ function getAllPlugsData() {
 }
 
 function getPlugData(plug) {
-   var promises = [];
-   var plugData = {
+   const promises = [];
+   const plugData = {
       name: plug.name,
       host: plug.host,
    };
 
-   promises.push(plug.getInfo().then(info => {
+   logger.warn('getting plug data', plug.name, plug.host);
+
+   promises.push(plug.getInfo({timeout:3000}).then(info => {
+      logger.info('got plug data', plug.name);
       plugData.info = info;
    }));
 
-   promises.push(plug.getPowerState().then(state => {
+   promises.push(plug.getPowerState({timeout:3000}).then(state => {
+      logger.info('got plug state', plug.name, state);
       plugData.state = state;
    }));
 

@@ -1,29 +1,32 @@
 {
   "name": "home-automation-server",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Alex Rodriguez's home automation server",
   "author": {
-     "name": "Alex Rodriguez",
-     "email": "alexbr@gmail.com"
+    "name": "Alex Rodriguez",
+    "email": "alexbr@gmail.com"
   },
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "actions-on-google": "actions-on-google/actions-on-google-nodejs",
+    "alexa-sdk": "^1.0.25",
     "basic-auth": "*",
-    "body-parser": "~1.15.2",
+    "body-parser": "^1.15.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.2.0",
     "express": "~4.14.0",
-    "hs100-api": "*",
+    "http-proxy": "^1.16.2",
     "jade": "~1.11.0",
     "lodash": "*",
+    "moment": "^2.20.1",
     "morgan": "~1.7.0",
-    "sonos-discovery": "jishi/node-sonos-discovery",
-    "sonos-http-api": "jishi/node-sonos-http-api",
-    "actions-on-google": "actions-on-google/actions-on-google-nodejs",
+    "mysql": "^2.15.0",
     "serve-favicon": "~2.3.0",
+    "sonos-discovery": "jishi/node-sonos-discovery",
+    "tplink-smarthome-api": "^0.22.0",
     "winston": "*"
   }
 }
