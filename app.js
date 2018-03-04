@@ -10,7 +10,7 @@ const logger = require('./lib/logger');
 const index = require('./routes/index');
 const Sonos = require('./routes/sonos');
 const hs100 = require('./routes/hs100');
-const SonosGoogle = require('./routes/sonos-google');
+//const SonosGoogle = require('./routes/sonos-google');
 const SonosAlexa = require('./routes/sonos-alexa');
 const settings = require('./settings');
 const SonosSystem = require('sonos-discovery');
@@ -93,8 +93,8 @@ var sonos = new Sonos(discovery);
 app.use('/sonos', sonosStatic, sonos.getRouter());
 
 // Sonos via Google
-var sonosGoogle = new SonosGoogle(discovery);
-app.use('/sonos-google', sonosGoogle.getRouter());
+//var sonosGoogle = new SonosGoogle(discovery);
+//app.use('/sonos-google', sonosGoogle.getRouter());
 
 var sonosAlexa = new SonosAlexa(discovery);
 app.use('/sonos-alexa', sonosStatic, sonosAlexa.getRouter());
