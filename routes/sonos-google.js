@@ -1,16 +1,27 @@
 'use strict';
 
+const _ = require('lodash');
 const util = require('util');
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const settings = require('../settings');
 const logger = require('../lib/logger');
-const { DialogflowApp } = require('actions-on-google');
+const { dialogflow } = require('actions-on-google');
 const SonosHandlers = require('../lib/sonos-google-handlers');
 const basicAuth = require('../lib/basic-auth');
 
+function addIntents(app, intents) {
+   intents.forEach((intent, intentName) => {
+      app.intent(intentName, intent);
+   });
+}
+
 function SonosGoogle(discovery) {
+   const sonosHandlers = new SonosHandlers(discovery);
+   const app = dialogflow();
+   addIntents(app, sonosHandlers.getHandlers());
+
    const router = express.Router();
 
    router.all('*', basicAuth.checkAuth(settings));
@@ -28,20 +39,13 @@ function SonosGoogle(discovery) {
       return router;
    };
 
-   const sonosHandlers = new SonosHandlers(discovery);
-
    function requestHandler(request, response) {
       if (request.url === '/favicon.ico') {
          response.end();
          return;
       }
 
-      const app = new DialogflowApp({
-         request: request,
-         response: response
-      });
-
-      app.handleRequest(sonosHandlers.getHandlers());
+      return app(request, response);
    }
 }
 

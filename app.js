@@ -5,43 +5,20 @@ const path = require('path');
 const loggerWare = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const httpProxy = require('http-proxy');
 const logger = require('./lib/logger');
 const index = require('./routes/index');
 const Sonos = require('./routes/sonos');
 const hs100 = require('./routes/hs100');
-//const SonosGoogle = require('./routes/sonos-google');
+const SonosGoogle = require('./routes/sonos-google');
 const SonosAlexa = require('./routes/sonos-alexa');
 const settings = require('./settings');
 const SonosSystem = require('sonos-discovery');
 
 const discovery = new SonosSystem(settings);
-const proxy = httpProxy.createProxyServer({ 
-   target: 'https://localhost',
-   secure: false,
-});
 
 var app = express();
 
 app.use(loggerWare('dev'));
-
-// Reverse proxy DMS services. Do this first before express/bodyParser get 
-// their hands on the request.
-app.all('/photo*', (req, res) => {
-   proxy.web(req, res);
-});
-
-app.all('/file*', (req, res) => {
-   proxy.web(req, res);
-});
-
-app.all('/audio*', (req, res) => {
-   proxy.web(req, res);
-});
-
-app.all('/download*', (req, res) => {
-   proxy.web(req, res);
-});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -82,10 +59,6 @@ app.all('*', (req, res, next) => {
 
 app.use('/', index);
 
-proxy.on('error', (err) => {
-   logger.warn(err);
-});
-
 // Sonos via Echo w/ Lambda
 // Serve up static files from the webroot
 var sonosStatic = express.static(settings.webroot + '/sonos');
@@ -93,8 +66,8 @@ var sonos = new Sonos(discovery);
 app.use('/sonos', sonosStatic, sonos.getRouter());
 
 // Sonos via Google
-//var sonosGoogle = new SonosGoogle(discovery);
-//app.use('/sonos-google', sonosGoogle.getRouter());
+var sonosGoogle = new SonosGoogle(discovery);
+app.use('/sonos-google', sonosGoogle.getRouter());
 
 var sonosAlexa = new SonosAlexa(discovery);
 app.use('/sonos-alexa', sonosStatic, sonosAlexa.getRouter());
@@ -117,6 +90,7 @@ app.use((err, req, res, next) => {
    // set locals, only providing error in development
    res.locals.message = err.message;
    res.locals.error = req.app.get('env') === 'development' ? err : {};
+   res.locals.urlPrefix = settings.urlPrefix;
 
    // render the error page
    res.status(err.status || 500);
