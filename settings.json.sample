@@ -1,0 +1,36 @@
+{
+   "port": 5004,
+   "securePort": 5005,
+   "auth": {
+      "username": "username",
+      "pass": "password"
+   },
+   "https": {
+      "key": "server.key",
+      "cert": "server.crt"
+   },
+   "urlPrefix": "/optional-prefix-for-server",
+   "appId": "amzn1.ask.skill.XYZ",
+   "defaultRoom": "Living Room",
+   "validRooms": [
+      "Living Room",
+      "Kitchen"
+   ],
+   "spotify": {
+      "accountSN": 0,
+      "clientId": "ABC",
+      "clientSecret": "XYZ"
+   },
+   "db": {
+      "mysql": {
+         "socket": "/tmp/mysql.sock",
+         "user": "username",
+         "password": "password",
+         "database": "database"
+      }
+   },
+   "ampControl": [{
+      "host": "arduino.somewhere.lan",
+      "room": "Living Room"
+   }]
+}
