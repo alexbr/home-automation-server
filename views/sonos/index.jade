@@ -1,7 +1,11 @@
-extends ../layout
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href=urlPrefix + '/stylesheets/style.css')
 
 block content
-   a(href='/') Back
+   a(href=urlPrefix + '/') Back
    img(class='logo' src='sonos-icon.png' alt='Sonos' width='256px')
 
    div(class='content')
@@ -37,20 +41,16 @@ block content
             span(class='method') GET
             a(href='reindex') /reindex
          p
-            span(class='method') GET
-            /sleep/{timeout in seconds or timestamp HH:MM:SS or off}
+            span(class='method') GET /sleep/{timeout in seconds or timestamp HH:MM:SS or off}
          p
-            span(class='method') GET
-            /preset/{JSON preset}
+            span(class='method') GET /preset/{JSON preset}
          p
-            span(class='method') GET
-            /preset/{predefined preset name}
+            span(class='method') GET /preset/{predefined preset name}
 
       div(class='docs')
          h2 Zone Control
          p
-            span(class='method') GET
-            /{zone name}/{action}[/{parameter}]
+            span(class='method') GET /{zone name}/{action}[/{parameter}]
 
          h3 Actions
          ul

@@ -26,6 +26,7 @@ router.get('/', (req, res) => {
       res.render('hs100/index', {
          title: 'HS100',
          plugsData: plugsData,
+         urlPrefix: settings.urlPrefix,
       });
    });
 });
