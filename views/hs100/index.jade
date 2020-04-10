@@ -1,18 +1,22 @@
-extends ../layout
-
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href=urlPrefix + '/stylesheets/style.css')
+  body
 block content
-   a(href='/') Back
+   a(href=urlPrefix + '/') Back
 
    h1= title
    div(class='docs')
       h2= 'Plug Control'
       each plug, plugName in plugsData
          p= plugName + ' is ' + (plug.state ? 'on' : 'off')
-            | 
+            br
             a(href=plugName + '/on') Turn on
-            | 
+            br
             a(href=plugName + '/off') Turn off
-            | 
+            br
             a(href=plugName) Get info
 
    div(class='docs')
