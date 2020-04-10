@@ -10,6 +10,7 @@ router.all('/', basicAuth.checkAuth(settings));
 /* GET home page. */
 router.get('/', (req, res) => {
    res.render('index', {
+      urlPrefix: settings.urlPrefix,
       title: "Alex's Home Automation Server"
    });
 });

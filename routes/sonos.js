@@ -14,6 +14,7 @@ function Sonos(discovery) {
    router.get('/', (req, res) => {
       res.render('sonos/index', {
          title: 'Sonos API',
+         urlPrefix: settings.urlPrefix,
       });
    });
 

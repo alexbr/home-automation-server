@@ -1,22 +1,18 @@
 'use strict';
 
 const express = require('express');
-const Alexa = require('alexa-sdk');
-const AlexaHandler = require('../lib/sonos-alexa-handlers');
-const SonosSystem = require('sonos-discovery');
-const settings = require('../settings');
-const logger = require('../lib/logger');
-const SonosAPI = require('../lib/sonos-api');
-
 const https = require('https');
 const url = require('url');
-//const crypto = require('crypto');
+const Alexa = require('alexa-sdk');
+const AlexaHandler = require('../lib/sonos-alexa-handlers');
+const settings = require('../settings');
+const logger = require('../lib/logger');
 
 let crypto;
 try {
-  crypto = require('crypto');
+   crypto = require('crypto');
 } catch (err) {
-  console.log('crypto support is disabled!');
+   logger.error('crypto support is disabled!');
 }
 
 const CERT_END = /-END CERTIFICATE-/;
@@ -71,7 +67,6 @@ function validateSignature(req) {
 }
 
 function SonosAlexa(discovery) {
-   const api = new SonosAPI(settings);
    const router = express.Router();
 
    router.post('/', (req, res) => {
@@ -88,11 +83,11 @@ function SonosAlexa(discovery) {
          // Build the context manually, because Amazon Lambda is missing
          const context = {
             succeed: result => {
-               console.log(result);
+               logger.info(result);
                res.json(result);
             },
             fail: error => {
-               console.log(error);
+               logger.error(error);
             }
          };
 
@@ -104,7 +99,7 @@ function SonosAlexa(discovery) {
             alexa.registerHandlers(alexaHandler.getIntentHandlers());
             alexa.execute();
          } catch(err) {
-            logger.warn(err);
+            logger.error(err);
          }
       }).catch(err => {
          if (err) {
