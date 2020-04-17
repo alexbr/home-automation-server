@@ -75,11 +75,9 @@ function SonosAlexa(discovery) {
          return;
       }
 
-      logger.warn(req.body);
+      logger.info(req.body);
 
       validateSignature(req).then(() => {
-         logger.info('signature validated');
-
          // Build the context manually, because Amazon Lambda is missing
          const context = {
             succeed: result => {
