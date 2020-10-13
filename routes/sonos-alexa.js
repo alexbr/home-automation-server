@@ -19,13 +19,13 @@ const CERT_END = /-END CERTIFICATE-/;
 
 function getCerts(data) {
    const certs = [];
-   const lines = data.split('\n');
+   const lines = data.split('\r\n');
    let currentCert = [];
 
    lines.forEach(line => {
       currentCert.push(line);
       if (CERT_END.test(line)) {
-         certs.push(currentCert.join('\n'));
+         certs.push(currentCert.join('\r\n'));
          currentCert = [];
       }
    });
@@ -48,16 +48,34 @@ function validateSignature(req) {
 
    return new Promise((resolve, reject) => {
       https.get(certUrl, certRes => {
+         const { statusCode } = certRes;
+         if (statusCode !== 200) {
+            certRes.resume();
+            return reject(
+               `cert retrieval from '${certUrl}' failed with status code ${statusCode}`);
+         }
+
+         let certData = '';
+
          certRes.on('data', data => {
-            const certs = getCerts(data.toString());
+            certData += data.toString();
+         });
+
+         certRes.on('end', () => {
+            const certs = getCerts(certData);
+            logger.warn(certs);
+            if (!certs || certs.length === 0) {
+               return reject(`no certs returned from '${certUrl}'!`);
+            }
+
             const verifier = crypto.createVerify('sha1');
             verifier.update(req.rawBody);
 
             if (verifier.verify(certs[0], signature, 'base64')) {
-               resolve();
-            } else {
-               reject('signature verification failed');
+               return resolve();
             }
+
+            reject('signature verification failed');
          });
       }).on('error', err => {
          logger.error(err);
@@ -68,6 +86,8 @@ function validateSignature(req) {
 
 function SonosAlexa(discovery) {
    const router = express.Router();
+   const alexaHandler = new AlexaHandler(discovery);
+   const handlers = alexaHandler.getIntentHandlers();
 
    router.post('/', (req, res) => {
       if (req.url === '/favicon.ico') {
@@ -92,9 +112,9 @@ function SonosAlexa(discovery) {
          // Delegate the request to the Alexa SDK and the declared intent-handlers
          try {
             const alexa = Alexa.handler(req.body, context);
-            const alexaHandler = new AlexaHandler(discovery, alexa);
+            alexaHandler.setAlexa(alexa);
             alexa.appId = settings.appId;
-            alexa.registerHandlers(alexaHandler.getIntentHandlers());
+            alexa.registerHandlers(handlers);
             alexa.execute();
          } catch(err) {
             logger.error(err);
