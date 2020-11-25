@@ -3,7 +3,7 @@
    "securePort": 5005,
    "auth": {
       "username": "username",
-      "pass": "password"
+      "password": "password"
    },
    "https": {
       "key": "server.key",

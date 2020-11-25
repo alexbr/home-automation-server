@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const logger = require('./lib/logger');
 const index = require('./routes/index');
 const Sonos = require('./routes/sonos');
+const amp = require('./routes/amp');
 const hs100 = require('./routes/hs100');
 const SonosGoogle = require('./routes/sonos-google');
 const SonosAlexa = require('./routes/sonos-alexa');
@@ -71,6 +72,9 @@ app.use('/sonos-google', sonosGoogle.getRouter());
 
 var sonosAlexa = new SonosAlexa(discovery);
 app.use('/sonos-alexa', sonosStatic, sonosAlexa.getRouter());
+
+// Amp control
+app.use('/amp', amp);
 
 // TP-Link HS-100
 app.use('/hs100', hs100);

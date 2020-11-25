@@ -20,8 +20,16 @@ h1 {
 .content {
    margin: 20px 25%;
 }
+.error {
+   background-color: #ef0000;
+   border: 2px solid #880000;
+   border-radius: 4px;
+   padding: 10px;
+   margin-bottom: 10px;
+}
 .docs {
    background-color: #f4f4f4;
+   border: 2px solid #999999;
    border-radius: 4px;
    padding: 10px;
    margin-bottom: 20px;

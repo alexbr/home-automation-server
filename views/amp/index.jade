@@ -1,0 +1,35 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href=urlPrefix + '/stylesheets/style.css')
+  body
+block content
+   a(href=urlPrefix + '/') Back
+
+if ampHost
+   div(class='content')
+      h1= title
+      if error
+         div(class='error') An error occurred.
+
+      div(class='docs')
+         h2= `Amplifier at ${ampHost}`
+         p
+            a(href='pwron') Power on
+            br
+            a(href='pwroff') Power off
+            br
+            a(href='volup') Volume up
+            br
+            a(href='voldown') Volume down
+            br
+            a(href='mute') Mute
+            br
+            a(href='unmute') Unmute
+            br
+            a(href='bal') Source balance
+            br
+            a(href='phone') Source record
+ else
+    h1= 'No amplifier configured'
