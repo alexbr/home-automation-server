@@ -29,7 +29,7 @@ app.set('view engine', 'jade');
 //app.use(favicon(path.join(__dirname, 'static', 'favicon.ico')));
 
 // Save raw body
-app.use((req, res, next) => {
+app.use((req, _, next) => {
    let data = '';
    req.on('data', chunk => {
       data += chunk;
@@ -80,7 +80,7 @@ app.use('/amp', amp);
 app.use('/hs100', hs100);
 
 // catch 404 and forward to error handler
-app.use((req, res, next) => {
+app.use((_, res, next) => {
    var err = new Error('Not Found');
    err.status = 404;
    next(err);
