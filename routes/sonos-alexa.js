@@ -63,7 +63,6 @@ function validateSignature(req) {
 
          certRes.on('end', () => {
             const certs = getCerts(certData);
-            logger.warn(certs);
             if (!certs || certs.length === 0) {
                return reject(`no certs returned from '${certUrl}'!`);
             }

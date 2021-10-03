@@ -30,8 +30,6 @@ try {
   console.log('no settings file found, will only use default settings');
 }
 
-console.log(settings);
-
 if (!fs.existsSync(settings.webroot + '/tts/')) {
   fs.mkdirSync(settings.webroot + '/tts/');
 }
