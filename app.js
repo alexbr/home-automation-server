@@ -15,6 +15,8 @@ const SonosAlexa = require('./routes/sonos-alexa');
 const settings = require('./settings');
 const SonosSystem = require('sonos-discovery');
 
+logger.info("log level", process.env.NODE_LOG_LEVEL);
+
 const discovery = new SonosSystem(settings);
 
 var app = express();
