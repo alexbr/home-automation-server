@@ -2,6 +2,7 @@
   "name": "home-automation-server",
   "version": "1.0.0",
   "description": "Alex Rodriguez's home automation server",
+  "type": "module",
   "author": {
     "name": "Alex Rodriguez",
     "email": "alexbr@gmail.com"

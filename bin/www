@@ -1,13 +1,14 @@
 #!/usr/bin/env node
+
 "use strict";
 
 // Module dependencies.
-const logger = require('../lib/logger');
-const http = require('http');
-const https = require('https');
-const fs = require('fs');
-const app = require('../app');
-const settings = require('../settings');
+import { error as _error, info, debug } from '../lib/logger.js';
+import { createServer } from 'http';
+import { createServer as _createServer } from 'https';
+import { readFileSync } from 'fs';
+import app from '../app.js';
+import settings from '../settings.js';
 
 // Get port from environment and store in Express.
 const port = normalizePort(settings.port || '3000');
@@ -17,25 +18,24 @@ app.set('port', port);
 let server;
 
 if (settings.https) {
-   var options = {};
-   if (settings.https.pfx) {
-      options.pfx = fs.readFileSync(settings.https.pfx);
-      options.passphrase = settings.https.passphrase;
-   } else if (settings.https.key && settings.https.cert) {
-      options.key = fs.readFileSync(settings.https.key);
-      options.cert = fs.readFileSync(settings.https.cert);
-   } else {
-      logger.error("Insufficient configuration for https");
-      return;
-   }
+  var options = {};
+  if (settings.https.pfx) {
+    options.pfx = readFileSync(settings.https.pfx);
+    options.passphrase = settings.https.passphrase;
+  } else if (settings.https.key && settings.https.cert) {
+    options.key = readFileSync(settings.https.key);
+    options.cert = readFileSync(settings.https.cert);
+  } else {
+    _error("Insufficient configuration for https");
+  }
 
-   const secureServer = https.createServer(options, app);
-   secureServer.listen(settings.securePort, function () {
-      logger.info('https server listening on port', settings.securePort);
-   });
+  const secureServer = _createServer(options, app);
+  secureServer.listen(securePort, function() {
+    info('https server listening on port', securePort);
+  });
 }
 
-server = http.createServer(app);
+server = createServer(app);
 
 // Listen on provided port, on all network interfaces.
 server.listen(port);
@@ -46,56 +46,54 @@ server.on('listening', onListening);
  * Normalize a port into a number, string, or false.
  */
 function normalizePort(val) {
-   var port = parseInt(val, 10);
+  var port = parseInt(val, 10);
 
-   if (isNaN(port)) {
-      // named pipe
-      return val;
-   }
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
 
-   if (port >= 0) {
-      // port number
-      return port;
-   }
+  if (port >= 0) {
+    // port number
+    return port;
+  }
 
-   return false;
+  return false;
 }
 
 /**
  * Event listener for HTTP server "error" event.
  */
 function onError(error) {
-   if (error.syscall !== 'listen') {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+    default:
       throw error;
-   }
-
-   var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
-
-   // handle specific listen errors with friendly messages
-   switch (error.code) {
-      case 'EACCES':
-         console.error(bind + ' requires elevated privileges');
-         process.exit(1);
-         break;
-      case 'EADDRINUSE':
-         console.error(bind + ' is already in use');
-         process.exit(1);
-         break;
-      default:
-         throw error;
-   }
+  }
 }
 
 /**
  * Event listener for HTTP server "listening" event.
  */
 function onListening() {
-   var addr = server.address();
-   var bind = typeof addr === 'string' ?
-      'pipe ' + addr : 'port ' + addr.port;
-   logger.debug('Listening on ' + bind);
+  var addr = server.address();
+  var bind = typeof addr === 'string' ?
+    'pipe ' + addr : 'port ' + addr.port;
+  debug('Listening on ' + bind);
 }
 
 process.on('unhandledRejection', (err) => {
-   logger.error(err);
+  _error(err);
 });

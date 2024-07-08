@@ -1,18 +1,18 @@
 'use strict';
 
-const express = require('express');
-const router = express.Router();
-const settings = require('../settings');
-const basicAuth = require('../lib/basic-auth');
+import { Router } from 'express';
+const router = Router();
+import settings from '../settings.js';
+import { checkAuth } from '../lib/basic-auth.js';
 
-router.all('/', basicAuth.checkAuth(settings));
+router.all('/', checkAuth(settings));
 
 /* GET home page. */
-router.get('/', (req, res) => {
-   res.render('index', {
-      urlPrefix: settings.urlPrefix,
-      title: "Alex's Home Automation Server"
-   });
+router.get('/', (_req, res) => {
+  res.render('index', {
+    urlPrefix: settings.urlPrefix,
+    title: "Alex's Home Automation Server"
+  });
 });
 
-module.exports = router;
+export default router;

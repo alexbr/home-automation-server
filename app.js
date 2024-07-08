@@ -1,19 +1,22 @@
 'use strict';
 
-const express = require('express');
-const path = require('path');
-const loggerWare = require('morgan');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const logger = require('./lib/logger');
-const index = require('./routes/index');
-const Sonos = require('./routes/sonos');
-const amp = require('./routes/amp');
-const hs100 = require('./routes/hs100');
-const SonosGoogle = require('./routes/sonos-google');
-const SonosAlexa = require('./routes/sonos-alexa');
-const settings = require('./settings');
-const SonosSystem = require('sonos-discovery');
+import express from 'express';
+import path from 'path';
+import loggerWare from 'morgan';
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
+import logger from './lib/logger.js';
+import index from './routes/index.js';
+import Sonos from './routes/sonos.js';
+import amp from './routes/amp.js';
+import hs100 from './routes/hs100.js';
+import SonosGoogle from './routes/sonos-google.js';
+import SonosAlexa from './routes/sonos-alexa.js';
+import settings from './settings.js';
+import SonosSystem from 'sonos-discovery';
+import dirname from './lib/helpers/dirname.js';
+
+const dirName = dirname(import.meta.url);
 
 logger.info("log level", process.env.NODE_LOG_LEVEL);
 
@@ -24,7 +27,7 @@ var app = express();
 app.use(loggerWare('dev'));
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(dirName, 'views'));
 app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /static
@@ -32,32 +35,32 @@ app.set('view engine', 'jade');
 
 // Save raw body
 app.use((req, _, next) => {
-   let data = '';
-   req.on('data', chunk => {
-      data += chunk;
-   });
-   req.on('end', () => {
-      req.rawBody = data;
-   });
+  let data = '';
+  req.on('data', chunk => {
+    data += chunk;
+  });
+  req.on('end', () => {
+    req.rawBody = data;
+  });
 
-   next();
+  next();
 });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'static')));
+app.use(express.static(path.join(dirName, 'static')));
 
 // Enable CORS requests
 app.all('*', (req, res, next) => {
-   res.set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-   res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  res.set('Access-Control-Allow-Origin', '*');
 
-   var acrh = req.headers['access-control-request-headers'];
-   if (acrh) {
-      res.set('Access-Control-Allow-Headers', acrh);
-   }
+  var acrh = req.headers['access-control-request-headers'];
+  if (acrh) {
+    res.set('Access-Control-Allow-Headers', acrh);
+  }
 
-   next();
+  next();
 });
 
 app.use('/', index);
@@ -82,25 +85,25 @@ app.use('/amp', amp);
 app.use('/hs100', hs100);
 
 // catch 404 and forward to error handler
-app.use((_, res, next) => {
-   var err = new Error('Not Found');
-   err.status = 404;
-   next(err);
+app.use((_, _res, next) => {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
 });
 
 // error handler
 app.use((err, req, res, next) => {
-   void(next);
-   logger.error('an error occurred', err);
+  void (next);
+  logger.error('an error occurred', err);
 
-   // set locals, only providing error in development
-   res.locals.message = err.message;
-   res.locals.error = req.app.get('env') === 'development' ? err : {};
-   res.locals.urlPrefix = settings.urlPrefix;
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.locals.urlPrefix = settings.urlPrefix;
 
-   // render the error page
-   res.status(err.status || 500);
-   res.render('error');
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
 });
 
-module.exports = app;
+export default app;

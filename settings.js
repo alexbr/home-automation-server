@@ -1,11 +1,14 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
+import { existsSync, mkdirSync, readFileSync } from 'fs';
+import { resolve } from 'path';
+import logger from './lib/logger.js';
+import dirname from './lib/helpers/dirname.js';
 
 function merge(target, source) {
   Object.keys(source).forEach((key) => {
-    if ((Object.getPrototypeOf(source[key]) === Object.prototype) && (target[key] !== undefined)) {
+    if ((Object.getPrototypeOf(source[key]) === Object.prototype)
+      && (target[key] !== undefined)) {
       merge(target[key], source[key]);
     } else {
       target[key] = source[key];
@@ -13,33 +16,36 @@ function merge(target, source) {
   });
 }
 
+const dirName = dirname(import.meta.url);
 var settings = {
   port: 5005,
   securePort: 5006,
-  cacheDir: path.resolve(__dirname, 'cache'),
-  webroot: path.resolve(__dirname, 'static'),
-  presetDir: path.resolve(__dirname, 'presets'),
+  cacheDir: resolve(dirName, 'cache'),
+  webroot: resolve(dirName, 'static'),
+  presetDir: resolve(dirName, 'presets'),
   announceVolume: 40
 };
 
-// load user settings
+// Load user settings
+const settingsJson = resolve(dirName, 'settings.json');
+logger.info(`trying to load ${settingsJson}`);
 try {
-  const userSettings = require(path.resolve(__dirname, 'settings.json'));
+  const userSettings = JSON.parse(readFileSync(settingsJson, 'utf8'));
   merge(settings, userSettings);
-} catch (e) {
-  console.log('no settings file found, will only use default settings');
+} catch (err) {
+  logger.warn(`error loading ${settingsJson}, will use default settings`, err);
 }
 
-if (!fs.existsSync(settings.webroot + '/tts/')) {
-  fs.mkdirSync(settings.webroot + '/tts/');
+if (!existsSync(settings.webroot + '/tts/')) {
+  mkdirSync(settings.webroot + '/tts/');
 }
 
-if (!fs.existsSync(settings.cacheDir)) {
+if (!existsSync(settings.cacheDir)) {
   try {
-    fs.mkdirSync(settings.cacheDir);
+    mkdirSync(settings.cacheDir);
   } catch (err) {
-    console.warn(`Could not create cache directory ${settings.cacheDir}, please create it manually for all features to work.`);
+    logger.warn(`Could not create cache directory ${settings.cacheDir}, please create it manually for all features to work.`);
   }
 }
 
-module.exports = settings;
+export default settings;

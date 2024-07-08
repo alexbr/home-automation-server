@@ -1,138 +1,139 @@
 'use strict';
 
-const _ = require('lodash');
-const express = require('express');
-const router = express.Router();
-const hs100 = require('tplink-smarthome-api');
-const client = new hs100.Client({ debug: true });
-const logger = require('../lib/logger');
-const settings = require('../settings');
-const basicAuth = require('../lib/basic-auth');
+import _  from 'lodash';
+import { Router } from 'express';
+const router = Router();
+import { Client } from 'tplink-smarthome-api';
+const client = new Client({ debug: true });
+import { info as _info, warn, error as _error } from '../lib/logger.js';
+import settings from '../settings.js';
+import { checkAuth } from '../lib/basic-auth.js';
 
 // Find plugs
 const plugs = {};
 client.startDiscovery().on('plug-new', plug => {
-   logger.info(`found plug ${plug.name} at ${plug.host}`);
-   plugs[plug.name] = plug;
+  _info(`found plug ${plug.name} at ${plug.host}`);
+  plugs[plug.name] = plug;
 }).on('plug-offline', plug => {
-   logger.warn('plug offline', plug);
-   delete plugs[plug.name];
+  warn('plug offline', plug);
+  delete plugs[plug.name];
 });
 
-router.all('*', basicAuth.checkAuth(settings));
+router.all('*', checkAuth(settings));
 
-router.get('/', (req, res) => {
-   getAllPlugsData().then(plugsData => {
-      res.render('hs100/index', {
-         title: 'HS100',
-         plugsData: plugsData,
-         urlPrefix: settings.urlPrefix,
-      });
-   });
+router.get('/', (_req, res) => {
+  getAllPlugsData().then(plugsData => {
+    res.render('hs100/index', {
+      title: 'HS100',
+      plugsData: plugsData,
+      urlPrefix: settings.urlPrefix,
+    });
+  });
 });
 
-router.get('/info', (req, res) => {
-   getAllPlugsData().then(plugsData => sendSuccess(res, plugsData));
+router.get('/info', (_req, res) => {
+  getAllPlugsData().then(plugsData => sendSuccess(res, plugsData));
 });
 
 router.get('/:plugname/state', (req, res) => {
-   var plugname = req.params.plugname;
-   if (_.isEmpty(plugname)) {
-      return sendError(res, 'Plug name is required.');
-   }
+  var plugname = req.params.plugname;
+  if (_.isEmpty(plugname)) {
+    return sendError(res, 'Plug name is required.');
+  }
 
-   var plug = plugs[plugname];
-   if (!plug) {
-      return sendError(res, `Plug ${plugname} not found.`);
-   }
+  var plug = plugs[plugname];
+  if (!plug) {
+    return sendError(res, `Plug ${plugname} not found.`);
+  }
 
-   getPlugData(plug).then(plugData => {
-      sendSuccess(res, { state: plugData.state });
-   });
+  getPlugData(plug).then(plugData => {
+    sendSuccess(res, { state: plugData.state });
+  });
 });
 
 router.get('/:plugname/:state', (req, res) => {
-   var plugname = req.params.plugname;
-   var state = req.params.state;
+  var plugname = req.params.plugname;
+  var state = req.params.state;
 
-   if (_.isEmpty(plugname) || _.isEmpty(state)) {
-      return sendError(res, 'Plug name and state are required.');
-   }
+  if (_.isEmpty(plugname) || _.isEmpty(state)) {
+    return sendError(res, 'Plug name and state are required.');
+  }
 
-   var plug = plugs[plugname];
-   if (!plug) {
-      return sendError(res, `Plug ${plugname} not found.`);
-   }
+  var plug = plugs[plugname];
+  if (!plug) {
+    return sendError(res, `Plug ${plugname} not found.`);
+  }
 
-   state = state.toLowerCase();
-   var enabled = state === 'true' || state === 't' || state === 'on';
+  state = state.toLowerCase();
+  var enabled = state === 'true' || state === 't' || state === 'on';
 
-   plug.setPowerState(enabled).then(() => {
-      getPlugData(plug).then(plugData => {
-         sendSuccess(res, { state: plugData.state });
-      });
-   });
+  plug.setPowerState(enabled).then(() => {
+    getPlugData(plug).then(plugData => {
+      sendSuccess(res, { state: plugData.state });
+    });
+  });
 });
 
 router.get('/:plugname', (req, res) => {
-   const plugname = req.params.plugname;
-   const plug = plugs[plugname];
-   if (!plug) {
-      return sendError(res, `Plug ${plugname} not found.`);
-   }
+  const plugname = req.params.plugname;
+  const plug = plugs[plugname];
+  if (!plug) {
+    return sendError(res, `Plug ${plugname} not found.`);
+  }
 
-   return getPlugData(plug).then(plugData => sendSuccess(res, plugData));
+  return getPlugData(plug).then(plugData => sendSuccess(res, plugData));
 });
 
-function getAllPlugsData() {
-   const plugsData = {};
-   const promises = _.map(plugs, plug => {
-      return getPlugData(plug).then(plugData => {
-         plugsData[plugData.name] = plugData;
-      });
-   });
+async function getAllPlugsData() {
+  const plugsData = {};
+  const promises = _.map(plugs, async plug => {
+    const plugData = await getPlugData(plug);
+    plugsData[plugData.name] = plugData;
+  });
 
-   return Promise.all(promises).then(() => plugsData);
+  await Promise.all(promises);
+  return plugsData;
 }
 
-function getPlugData(plug) {
-   const promises = [];
-   const plugData = {
-      name: plug.name,
-      host: plug.host,
-   };
+async function getPlugData(plug) {
+  const promises = [];
+  const plugData = {
+    name: plug.name,
+    host: plug.host,
+  };
 
-   logger.warn('getting plug data', plug.name, plug.host);
+  warn('getting plug data', plug.name, plug.host);
 
-   promises.push(plug.getInfo({timeout:3000}).then(info => {
-      logger.info('got plug data', plug.name);
-      plugData.info = info;
-   }));
+  promises.push(plug.getInfo({ timeout: 3000 }).then(info => {
+    _info('got plug data', plug.name);
+    plugData.info = info;
+  }));
 
-   promises.push(plug.getPowerState({timeout:3000}).then(state => {
-      logger.info('got plug state', plug.name, state);
-      plugData.state = state;
-   }));
+  promises.push(plug.getPowerState({ timeout: 3000 }).then(state => {
+    _info('got plug state', plug.name, state);
+    plugData.state = state;
+  }));
 
-   return Promise.all(promises).then(() => plugData);
+  await Promise.all(promises);
+  return plugData;
 }
 
 function sendSuccess(res, data) {
-   if (data === undefined) {
-      data = {};
-   }
+  if (data === undefined) {
+    data = {};
+  }
 
-   res.status(200);
-   res.json({ status: 'success', result: data });
-   return res;
+  res.status(200);
+  res.json({ status: 'success', result: data });
+  return res;
 }
 
 function sendError(res, msg) {
-   logger.error('error', msg);
+  _error('error', msg);
 
-   res.status(500);
-   res.json({ status: 'failure', error: msg });
-   return res;
+  res.status(500);
+  res.json({ status: 'failure', error: msg });
+  return res;
 }
 
-module.exports = router;
+export default router;
